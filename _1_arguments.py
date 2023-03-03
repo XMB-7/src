@@ -1,14 +1,9 @@
 import argparse
-import os
-
-path = '/net/nasstore/students/UNGRAD/UE/xbai/home/MyThesis/src'
-os.chdir(path)
 
 args = argparse.ArgumentParser()
 
-#
-# following arguments are set for downloading radar files
-#
+### for downloading radar files
+###
 
 args.add_argument(
     '--radar_id',
@@ -27,18 +22,22 @@ args.add_argument(
         on a specific day in that month"""
 )
 
-# args.add_argument(
-#     '--dates',
-#     type=list,
-#     default=(),
-#     # 这个不该在这里定义 而是稍后往字典里面加 ❓
-#     help='a list of tuples of all selected dates' 
-# )
+args.add_argument(
+    '--dates',
+    type=list,
+    default=(),
+    # 这个要根据args.precip_periods来进行取值
+    # 需要提前定义出来 稍后再算具体数值
+    # 对此不知有无更好处理方案 ⁉️
+    help='a list of tuples of all selected dates' 
+)
 
 args.add_argument(
     '--files_rootdir',
     type=str,
     default='',
+    # 这个要根据args.radar_id来进行取值
+    # 所以同上
     help='root directory where radar sigmet files being located'
 )
 
@@ -218,25 +217,26 @@ args.add_argument(
 # #<< 到终端上才能执行这一语句 从而真正生成参数
 # #<< 然后才能接着设置那些需要用到其他参数的取值的参数的取值
 
-#
-# following arguments are set for downloading radar files
-#
-args.precip_periods['month_1'] = (
+
+### following arguments are set for downloading radar files
+###
+
+args.precip_periods['month_1'] = [
 ('20200110_140000', '20200111_000000'),
-# 似乎应该改成170000 好像是失误了 前面都是晴天 但也无伤大雅
+# 似乎应该改成170000 好像是手误了 14-17都是晴天 但也无伤大雅
 ('20200111_000000', '20200111_150000'),
 ('20200116_090000', '20200117_000000'),
 ('20200117_000000', '20200118_000000'),
 ('20200122_000000', '20200123_000000'),
 ('20200128_000000', '20200129_000000')
-)
-args.precip_periods['month_2'] = (
+]
+args.precip_periods['month_2'] = [
 ('20200204_000000', '20200204_140000'),
 ('20200205_000000', '20200206_000000'), 
 ('20200210_000000', '20200211_000000'),
 ('20200212_000000', '20200212_180000')
-)
-args.precip_periods['month_3'] = (
+]
+args.precip_periods['month_3'] = [
 ('20200305_000000', '20200305_040000'),
 ('20200313_000000', '20200313_150000'),
 ('20200316_000000', '20200316_040000'),
@@ -247,8 +247,8 @@ args.precip_periods['month_3'] = (
 ('20200322_000000', '20200322_120000'),
 ('20200328_040000', '20200328_220000'),
 ('20200330_000000', '20200331_000000')
-)
-args.precip_periods['month_4'] = (
+]
+args.precip_periods['month_4'] = [
 ('20200402_140000', '20200403_000000'),
 ('20200403_000000', '20200403_110000'),
 ('20200411_130000', '20200412_000000'),
@@ -256,8 +256,8 @@ args.precip_periods['month_4'] = (
 ('20200419_080000', '20200419_230000'),
 ('20200422_120000', '20200423_000000'),
 ('20200428_030000', '20200428_140000'),
-)
-args.precip_periods['month_5'] = (
+]
+args.precip_periods['month_5'] = [
 ('20200508_000000', '20200508_170000'),
 ('20200512_050000', '20200512_140000'),
 ('20200514_030000', '20200514_130000'),
@@ -271,8 +271,8 @@ args.precip_periods['month_5'] = (
 ('20200525_000000', '20200526_000000'),
 ('20200527_110000', '20200528_000000'),
 ('20200528_000000', '20200528_150000')
-)
-args.precip_periods['month_6'] = (
+]
+args.precip_periods['month_6'] = [
 ('20200605_000000', '20200605_130000'),
 ('20200619_150000', '20200620_000000'),
 ('20200620_000000', '20200620_200000'),
@@ -281,15 +281,18 @@ args.precip_periods['month_6'] = (
 ('20200623_040000', '20200624_000000'),
 ('20200624_000000', '20200625_000000'),
 ('20200630_000000', '20200630_070000')
-)
-# temp_list = []
-# for month in args.precip_periods.keys():
-#     temp_list += [period[0][0: 10] for period in args.precip_periods[month]]
-# args.dates = tuple(temp_list)
-# #<< 借助args.precip_periods取值 设置args.dates取值
-# #<< 注意元组是不能扩容的 所以要临时用一个列表来过渡一下
-# args.file_root = f'{args.radar_id}_Sigmet'
-# #<< ? 这里仍是一个相对路径 稍后建议还是改成绝对路径
+]
+
+dates = []
+for month in args.precip_periods.keys():
+    dates += [period[0][0: 7] for period in args.precip_periods[month]]
+args.dates = dates
+# 借助args.precip_periods取值 设置args.dates取值
+
+args.files_rootdir = f'../data/{args.radar_id}_Sigmet'
+# 这是一个相对路径 其取决于该配置文件的位置
+
+
 
 # #>> following arguments are set for plotting radar files
 # args.grid_shape = (1, args.img_size[0], args.img_size[0])
