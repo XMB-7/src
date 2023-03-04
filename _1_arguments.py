@@ -1,18 +1,23 @@
+# 这段代码 如果出现在了单独脚本里面
+# 那么就要使用%run 直接import不行 因为参数要在终端里面生成
+# 但这就要求是ipython 该怎么办 
+# 如果是直接执行命令行指令 !python args.py 它的结果又不继承
+# 难道只能把它们存入主程序之中 ⁉️
+
 import argparse
 
-args = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 
-### for downloading radar files
-###
+# for downloading radar files >
 
-args.add_argument(
+parser.add_argument(
     '--radar_id',
     type=str,
     default='KFWS',
     help="which nexrad radar is the seleceted data being sampled from"
 )
 
-args.add_argument(
+parser.add_argument(
     '--precip_periods',
     type=dict,
     default={},
@@ -22,53 +27,54 @@ args.add_argument(
         on a specific day in that month"""
 )
 
-args.add_argument(
+parser.add_argument(
     '--dates',
     type=list,
     default=(),
-    # 这个要根据args.precip_periods来进行取值
-    # 需要提前定义出来 稍后再算具体数值
-    # 对此不知有无更好处理方案 ⁉️
+    # 要根据args.precip_periods来定值
+    # 故而提前定义出来 等统一生成参数后 再赋予它具体数值
+    # 这个变量不该作为参数出现 但不这样就加不进args 
+    # 不知道有没有更好处理方案
+    # 对于该模块的使用 仍然需要学习 ⁉️
     help='a list of tuples of all selected dates' 
 )
 
-args.add_argument(
+parser.add_argument(
     '--files_rootdir',
     type=str,
     default='',
-    # 这个要根据args.radar_id来进行取值
-    # 所以同上
-    help='root directory where radar sigmet files being located'
+    # 要根据args.radar_id来定值
+    help="root directory where radar sigmet files being located"
 )
 
 # #>> following arguments are set for plotting radar data files
-# args.add_argument(
+# parser.add_argument(
 #     '--field',
 #     type=str,
 #     default='reflectivity',
 #     help='values of which field to be plotted'
 # )
 #
-# args.add_argument(
+# parser.add_argument(
 #     '--field_value_range',
 #     type=tuple,
 #     default=(0, 70),
 #     help='field values only within (min, max) would be plotted'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--img_size',
 #     type=tuple,
 #     default=(128, 128),
 #     help='plotted image size'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--grid_limits',
 #     type=tuple,
 #     default=((0e4, 2e4), (-3e5, 3e5), (-3e5, 3e5)),
 #     help='''volume size centered around the radar to be plotted; in meters
 #         for z, y, x coordinates'''
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--grid_shape',
 #     type=tuple,
 #     default=(),
@@ -78,7 +84,7 @@ args.add_argument(
 # #<< ? 对这个参数理解还不到位
 # #<< ? Cuomo's comment: define shape of frames (first dimension is Z)
 # #<< ? 还得多看一看别人的代码
-# args.add_argument(
+# parser.add_argument(
 #     '--kernel_size',
 #     type=tuple,
 #     default=None,
@@ -86,7 +92,7 @@ args.add_argument(
 #         to calculate the local average values indicating the precipitation intensity.
 #         Just think of it as how big the clouds are considerd in the image.'''
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--thresholds',
 #     type=dict,
 #     default={'frame': (30, 1), 'sequence': 1},
@@ -98,13 +104,13 @@ args.add_argument(
 #         a sequence with at least 1 frame being regarded as covering intense 
 #         precipitation content would be regarded as desired for training.'''
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--img_root',
 #     type=str,
 #     default='',
 #     help='the root derectory for all the plotted images'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--precip_sign',
 #     type=str,
 #     default='_P',
@@ -112,25 +118,25 @@ args.add_argument(
 # )
 
 # #>> following arguments are set for constructing datasets
-# args.add_argument(
+# parser.add_argument(
 #     '--part_ratio',
 #     type=float,
 #     default=0.8,
 #     help='partition ratio for spliting training set and validation set'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--n_inputs',
 #     type=int,
 #     default=20,
 #     help='how many images used as inputs'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--n_outputs',
 #     type=int,
 #     default=20,
 #     help='how many images to predict'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--n_seq',
 #     type=int,
 #     default=40,
@@ -138,13 +144,13 @@ args.add_argument(
 # )
 
 # #>> following arguments are set for preparations for model training
-# args.add_argument(
+# parser.add_argument(
 #     '--batch_size',
 #     type=int,
 #     default=10,
 #     help='how many image sequence samples in a batch used for model training'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--criterion',
 #     type=tuple,
 #     default=('MAE', 'MSE', 'Smooth_MAE'),
@@ -152,58 +158,58 @@ args.add_argument(
 # )
 
 # #>> following arguments are set for model training
-# args.add_argument(
+# parser.add_argument(
 #     '--model_archi',
 #     type=str,
 #     default='',
 #     help='model architecture selected to implement nowcasting'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--loss_fn',
 #     type=str,
 #     default='',
 #     help='loss function selected to evaluate the error.'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--cp_save_path',
 #     type=str,
 #     default='',
 #     help='where checkpoint being saved to resume previous training'
 # )
 
-# args.add_argument(
+# parser.add_argument(
 #     '--loss_records_save_dir',
 #     type = str,
 #     default = 'logs/loss_records',
 #     help = 'dir where a loss record file is saved'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--pred_img_dir',
 #     type = str,
 #     default = 'logs/predictions',
 #     help = 'dir where predicted images are saved'
 # )
 
-# args.add_argument(
+# parser.add_argument(
 #     '--n_epoches',
 #     type=int,
 #     default=300,
 #     help='how many times iterating through all examples'
 # )
 
-# args.add_argument(
+# parser.add_argument(
 #     '--lr',
 #     type = float,
 #     default = 1e-3,
 #     help = 'learning rate for training'
 # )
-# args.add_argument(
+# parser.add_argument(
 #     '--wd',
 #     type = float,
 #     default = 5e-4,
 #     help = 'weight decay for training'
 # )
-# # args.add_argument(
+# # parser.add_argument(
 # #     '--plot_grayscale',
 # #     type=bool,
 # #     default=True,
@@ -213,13 +219,11 @@ args.add_argument(
 # #<< ? 提取的数据是2D数组 比如(128, 128) 
 # #<< ? 所以前面绘图保存那一部分完全不需要绘制彩色图 没道理多存两个相同的2D矩阵
 
-# args = args.parse_args() 
-# #<< 到终端上才能执行这一语句 从而真正生成参数
-# #<< 然后才能接着设置那些需要用到其他参数的取值的参数的取值
+# 执行完该语句 各参数才真正被生成 >
+# 然后才能对上述默认为空的参数赋值
+args = parser.parse_args() 
 
-
-### following arguments are set for downloading radar files
-###
+# for downloading radar files >
 
 args.precip_periods['month_1'] = [
 ('20200110_140000', '20200111_000000'),
@@ -285,14 +289,11 @@ args.precip_periods['month_6'] = [
 
 dates = []
 for month in args.precip_periods.keys():
-    dates += [period[0][0: 7] for period in args.precip_periods[month]]
+    dates += [period[0][0: 8] for period in args.precip_periods[month]]
 args.dates = dates
-# 借助args.precip_periods取值 设置args.dates取值
 
 args.files_rootdir = f'../data/{args.radar_id}_Sigmet'
 # 这是一个相对路径 其取决于该配置文件的位置
-
-
 
 # #>> following arguments are set for plotting radar files
 # args.grid_shape = (1, args.img_size[0], args.img_size[0])
@@ -306,5 +307,3 @@ args.files_rootdir = f'../data/{args.radar_id}_Sigmet'
 
 
 # args.n_seq = args.n_inputs + args.n_outputs
-
-# os.chdir(args.working_dir)
