@@ -93,7 +93,7 @@ parser.add_argument(
 parser.add_argument(
     '--thresholds',
     type=dict,
-    default={'for_frame': (30, 1), 'for_sequence': 1},
+    default={'for_frame': (30, 1), 'for_seq': 1},
     help="""The default threshold for frame is a tuple of ints, the first integer 
         is in dBz for reflectivity data. (30, 1) indicates that a frame with 
         at least 1 average field value in a local region exceeding 30dBz 
