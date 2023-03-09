@@ -8,7 +8,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-# for downloading radar files >
+# for downloading radar data files >
 
 parser.add_argument(
     '--radar_id',
@@ -148,14 +148,14 @@ parser.add_argument(
     help='how many images form a sequence instance'
 )
 
-# for preparations on model training >
-
 parser.add_argument(
     '--batch_size',
     type=int,
     default=32,
     help='how many image sequence samples in a batch used for model training'
 )
+
+# for preparations on model training >
 
 parser.add_argument(
     '--criterion',
@@ -207,7 +207,6 @@ parser.add_argument(
     default='',
     help='where generated log files will locate in'
 )
-
 
 parser.add_argument(
     '--ckpt_dir',
@@ -372,6 +371,7 @@ args.data_dir = f'../data/{args.radar_id}_Sigmet'
 # 这是一个相对路径 其取决于该配置文件的位置
 
 # for plotting radar files >
+
 args.grid_shape = (1, args.img_size[0], args.img_size[0])
 args.img_dir = f'../data/{args.radar_id}_Image_{args.img_size[0]}'
 
